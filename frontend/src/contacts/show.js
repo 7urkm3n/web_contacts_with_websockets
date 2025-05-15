@@ -1,9 +1,10 @@
 import React, { useState, useEffect, Fragment} from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import config from './../config'
 
 export const Show = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
   const contact = location.state;
 
@@ -29,6 +30,26 @@ export const Show = () => {
     return val[firstKey]
   }
 
+  const deleteContact = async (id) => {
+    console.log("id: ", id);
+
+      fetch(`${config.API_URL}/contacts/${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'DELETE',
+        mode: 'cors'
+      })
+      .then(
+        navigate("/contacts")
+      )
+      .catch(console.log("Cant delete"));
+  }
+
+  const editContact = async (id) => {
+    console.log("Edit Contact Implement");
+  }
+
   return ( 
     <div className="p-6 max-w-4xl mx-auto">
       <div className="bg-white max-w-2xl shadow overflow-hidden sm:rounded-lg">
@@ -42,6 +63,19 @@ export const Show = () => {
               <p className="mt-1 max-w-2xl text-sm text-gray-500">
                 <b> Phone Number: </b> {contact.phone_number} 
               </p>
+          </div>
+
+          <div className="px-4">
+            <button onClick={()=> editContact} className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+              Edit
+            </button>
+            <span>&nbsp;&nbsp;</span>
+            <button onClick={()=> deleteContact(contact.id)} className="text-white inline-flex items-center bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+              Delete
+            </button>
+          </div>
+
+          <div className="px-4">
           </div>
           <div className="border-t border-gray-200">
             <dl>
