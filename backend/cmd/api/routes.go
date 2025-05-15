@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 )
 
 func (app *application) routes() http.Handler {
@@ -24,5 +25,6 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodDelete, "/contacts/:id", app.deleteContactHandler)
 	router.HandlerFunc(http.MethodGet, "/contacts/:id/history", app.GetContactHistoryHandler)
 
-	return app.recoverPanic(router)
+	return cors.AllowAll().Handler(router)
+	// return app.recoverPanic(app.enableCORS(router))
 }

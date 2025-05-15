@@ -36,24 +36,25 @@ func (app *application) wsConnectionHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	// distribute data to the WS requester
 	ws.WriteJSON(map[string]any{"type": "allContacts", "contacts": contacts})
 
 	for {
-		var contact models.Contact
-		err := ws.ReadJSON(&contact)
+		var contact *models.Contact
+		err = ws.ReadJSON(&contact)
 		if err != nil {
 			log.Printf("error wsConnectionHandler: %v", err)
 			delete(clients, ws)
 			break
 		}
-		broadcast <- contact
+		broadcast <- *contact
 	}
-
 }
 
-func (app *application) writeWsContact(t string, c *models.Contact) {
+// distribute WS clients on create/update/delete
+func (app *application) writeWsContact(req string, c *models.Contact) {
 	for client := range clients {
-		err := client.WriteJSON(map[string]any{"type": t, "contact": c})
+		err := client.WriteJSON(map[string]any{"type": req, "contact": c})
 		if err != nil {
 			log.Printf("error handleContact: %v", err)
 			client.Close()
@@ -63,15 +64,16 @@ func (app *application) writeWsContact(t string, c *models.Contact) {
 }
 
 func (app *application) pushContact() {
-	for {
-		c := <-broadcast
-		for client := range clients {
-			err := client.WriteJSON(c)
-			if err != nil {
-				log.Printf("error pushContact: %v", err)
-				client.Close()
-				delete(clients, client)
-			}
-		}
-	}
+	// for {
+	// 	c := <-broadcast
+	// 	fmt.Println("contact HERE?: ", c)
+	// 	for client := range clients {
+	// 		err := client.WriteJSON(c)
+	// 		if err != nil {
+	// 			log.Printf("error pushContact: %v", err)
+	// 			client.Close()
+	// 			delete(clients, client)
+	// 		}
+	// 	}
+	// }
 }
