@@ -79,7 +79,7 @@ func (m ContactModel) Insert(contact *Contact) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 21*time.Second)
 	defer cancel()
 	args := []any{contact.FirstName, contact.LastName, contact.Email, contact.PhoneNumber}
-	// time.Sleep(20 * time.Second) // sleep for task
+	time.Sleep(20 * time.Second) // sleep for task
 	return m.DB.QueryRowContext(ctx, query, args...).Scan(&contact.ID, &contact.CreatedAt)
 }
 
